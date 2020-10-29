@@ -6,6 +6,7 @@ const { cleanPaginationID } = require('./cleanPaginationID')
 /**
  * Gets items from database
  * @param {Object} req - request object
+ * @param model
  * @param {Object} query - query object
  */
 const getItems = async (req = {}, model = {}, query = {}) => {
@@ -15,7 +16,7 @@ const getItems = async (req = {}, model = {}, query = {}) => {
       if (err) {
         return reject(buildErrObject(422, err.message))
       }
-      resolve(cleanPaginationID(items))
+      resolve(cleanPaginationID(items, ['id', '_id']))
     })
   })
 }
