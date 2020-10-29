@@ -1,7 +1,6 @@
 const json = [
   { name: 'usdngn', rate: 450 },
-  { name: 'ghcngn', rate: 65 },
-  { name: 'eurngn', rate: 550 }
+  { name: 'usdghs', rate: 5.8 }
 ]
 
 module.exports = json

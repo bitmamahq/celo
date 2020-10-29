@@ -24,15 +24,22 @@ const TransactionSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
+    fee: {
+      type: Number,
+      required: true
+    },
     currencyPair: {
       type: String,
       required: true
     },
     status: {
       type: String,
-      default: 'processing',
-      enum: ['processing', 'completed', 'failed'],
+      default: 'pending',
+      enum: ['pending', 'processing', 'completed', 'failed'],
       required: true
+    },
+    reason: {
+      type: String
     },
     userId: {
       type: mongoose.ObjectId,

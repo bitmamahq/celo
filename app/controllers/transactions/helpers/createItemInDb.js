@@ -11,9 +11,8 @@ const createItemInDb = ({
   srcAmount = '',
   destAmount = '',
   rate = '',
-  currencyPair = '',
-  status = '',
-  userId = ''
+  fee = '',
+  currencyPair = ''
 }) => {
   return new Promise((resolve, reject) => {
     const transaction = new Transaction({
@@ -23,16 +22,16 @@ const createItemInDb = ({
       destAmount,
       rate,
       currencyPair,
-      status,
-      userId
+      fee
     })
+
     transaction.save((err, item) => {
       if (err) {
-        reject(buildErrObject(422, err.message))
+        return reject(buildErrObject(422, err.message))
       }
 
       item = JSON.parse(JSON.stringify(item))
-      resolve(item)
+      return resolve(item)
     })
   })
 }

@@ -9,12 +9,10 @@ const trimRequest = require('trim-request')
 
 const { roleAuthorization } = require('../controllers/auth')
 
-const { getRates, getRate } = require('../controllers/rates')
+const { createTransaction } = require('../controllers/transactions')
 
 /*
  * Get rates route
  */
-router.get('/', trimRequest.all, getRates)
-router.get('/:pair', trimRequest.all, getRate)
-
+router.post('/', trimRequest.all, createTransaction)
 module.exports = router
