@@ -24,11 +24,14 @@
   },
   "license": "APACHE",
   "dependencies": {
+    "@celo/contractkit": "^0.4.17",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^3.23.3",
-    "morgan": "^1.10.0"
+    "mongoose": "^5.10.11",
+    "morgan": "^1.10.0",
+    "web3": "^1.3.0"
   },
   "devDependencies": {
     "eslint": "^7.4.0",
