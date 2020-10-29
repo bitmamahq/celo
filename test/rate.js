@@ -26,4 +26,36 @@ describe('*********** RATE ***********', () => {
         })
     })
   })
+
+  describe('/GET/:peer rate', () => {
+    it('it should GET a rate by the given peer', (done) => {
+      const realPeer = 'usdngn'
+      const fakePeer = 'myname'
+      chai
+        .request(server)
+        .get(`/rates/${realPeer}`)
+        .end((error, res) => {
+          res.should.have.status(200)
+          res.body.should.be.a('object')
+          res.body.should.have.property('msg')
+          res.body.msg.should.have.property('name').eql(realPeer)
+          res.body.msg.should.have.property('rate')
+          done()
+        })
+    })
+
+    it('it should not GET a rate for the given peer', (done) => {
+      const fakePeer = 'myname'
+      chai
+        .request(server)
+        .get(`/rates/${fakePeer}`)
+        .end((error, res) => {
+          res.should.have.status(400)
+          res.body.should.be.a('object')
+          res.body.should.have.property('errors')
+          res.body.errors.should.have.property('msg')
+          done()
+        })
+    })
+  })
 })
