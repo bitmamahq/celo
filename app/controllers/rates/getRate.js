@@ -1,19 +1,30 @@
 const Rate = require('../../models/rate')
 const { handleError } = require('../../middleware/utils')
-const { getItems, checkQueryString } = require('../../middleware/db')
 
 /**
- * Get items function called by route
+ * Get item function called by route
  * @param {Object} req - request object
  * @param {Object} res - response object
  */
-const getRates = async (req, res) => {
+const getRate = async (req, res) => {
   try {
-    const query = await checkQueryString(req.query)
-    res.status(200).json(await getItems(req, Rate, query))
+    let peer = req.params.peer
+    const peers = ['usdngn', 'eurngn', 'ghcngn']
+
+    if (!peers.includes(peer)) {
+      throw new Error('Peer not valid')
+    }
+
+    let query = await Rate.findOne({ name: peer }).select('-_id').lean()
+
+    if (!query) {
+      throw new Error('Record not in DB')
+    }
+
+    res.status(200).json({ msg: query })
   } catch (error) {
     handleError(res, error)
   }
 }
 
-module.exports = { getRates }
+module.exports = { getRate }

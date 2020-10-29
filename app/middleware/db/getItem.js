@@ -3,6 +3,7 @@ const { itemNotFound } = require('../../middleware/utils')
 /**
  * Gets item from database by id
  * @param {string} id - item id
+ * @param model
  */
 const getItem = (id = '', model = {}) => {
   return new Promise((resolve, reject) => {

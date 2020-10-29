@@ -9,11 +9,12 @@ const trimRequest = require('trim-request')
 
 const { roleAuthorization } = require('../controllers/auth')
 
-const { getRates } = require('../controllers/rates')
+const { getRates, getRate } = require('../controllers/rates')
 
 /*
  * Get rates route
  */
 router.get('/', trimRequest.all, getRates)
+router.get('/:peer', trimRequest.all, getRate)
 
 module.exports = router
