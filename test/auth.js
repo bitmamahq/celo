@@ -166,6 +166,7 @@ describe('*********** AUTH ***********', () => {
           done()
         })
     })
+
     it('it should GET a fresh token', (done) => {
       chai
         .request(server)

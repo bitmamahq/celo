@@ -1,0 +1,49 @@
+const mongoose = require('mongoose')
+const validator = require('validator')
+const mongoosePaginate = require('mongoose-paginate-v2')
+
+const TransactionSchema = new mongoose.Schema(
+  {
+    srcCurrency: {
+      type: String,
+      required: true
+    },
+    destCurrency: {
+      type: String,
+      required: true
+    },
+    srcAmount: {
+      type: String,
+      required: true
+    },
+    destAmount: {
+      type: String,
+      required: true
+    },
+    rate: {
+      type: Number,
+      required: true
+    },
+    currencyPair: {
+      type: String,
+      required: true
+    },
+    status: {
+      type: String,
+      default: 'processing',
+      enum: ['processing', 'completed', 'failed'],
+      required: true
+    },
+    userId: {
+      type: mongoose.ObjectId,
+      ref: 'User'
+    }
+  },
+  {
+    versionKey: false,
+    timestamps: true
+  }
+)
+
+TransactionSchema.plugin(mongoosePaginate)
+module.exports = mongoose.model('Transaction', TransactionSchema)
