@@ -13,11 +13,11 @@ const TransactionSchema = new mongoose.Schema(
       required: true
     },
     srcAmount: {
-      type: String,
+      type: Number,
       required: true
     },
     destAmount: {
-      type: String,
+      type: Number,
       required: true
     },
     rate: {
@@ -31,6 +31,19 @@ const TransactionSchema = new mongoose.Schema(
     currencyPair: {
       type: String,
       required: true
+    },
+    country: {
+      type: String,
+      required: true
+    },
+    bankName: {
+      type: String
+    },
+    bankCode: {
+      type: String
+    },
+    bankAccountNumber: {
+      type: String
     },
     status: {
       type: String,

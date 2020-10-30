@@ -13,7 +13,7 @@ let flatFee = Number.parseFloat(process.env.FLAT_FEE)
 const createTransaction = async (req, res) => {
   try {
     let data = req.body
-    let pair
+    let pair, fee, finalAmount
     if (data.destCurrency === 'ghs') {
       pair = 'usdghs'
     } else {
@@ -23,22 +23,27 @@ const createTransaction = async (req, res) => {
     let rateData = await RateModel.findOne({ name: pair }).select('-_id').lean()
     let rate = rateData.rate
     let destAmount = rate * data.srcAmount
-    let price = (percentageFee / 100) * destAmount
-    let finalAmount =
-      price < flatFee ? destAmount - price : destAmount - flatFee
+    let txCharge = (percentageFee / 100) * data.srcAmount
 
-    console.log('PRICE::: ', price)
+    if (txCharge > flatFee) {
+      fee = flatFee * rate
+    } else {
+      fee = txCharge * rate
+    }
 
-    console.log('destAmount:: ', finalAmount)
-
+    finalAmount = destAmount - fee
     let transObj = {
       srcCurrency: data.srcCurrency,
       destCurrency: data.destCurrency,
       srcAmount: data.srcAmount,
       destAmount: finalAmount,
-      fee: price,
+      fee,
       rate,
-      currencyPair: pair
+      currencyPair: pair,
+      country: data.destCurrency === 'ghs' ? 'GH' : 'NG',
+      bankCode: data.bankCode,
+      bankAccountNumber: data.bankAccountNumber,
+      bankName: data.bankName
     }
     const item = await createItemInDb(transObj)
     res.status(201).json(item)
