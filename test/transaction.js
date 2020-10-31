@@ -119,4 +119,12 @@ describe('*********** TRANSACTION ***********', () => {
         })
     })
   })
+
+  after(() => {
+    Transaction.findByIdAndRemove(transactionId, (err) => {
+      if (err) {
+        console.log(err)
+      }
+    })
+  })
 })
