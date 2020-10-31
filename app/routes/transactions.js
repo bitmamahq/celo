@@ -9,10 +9,17 @@ const trimRequest = require('trim-request')
 
 const { roleAuthorization } = require('../controllers/auth')
 
-const { createTransaction } = require('../controllers/transactions')
+const {
+  createTransaction,
+  getTransaction
+} = require('../controllers/transactions')
+const {
+  validateGetTransaction
+} = require('../controllers/transactions/validators')
 
 /*
  * Get rates route
  */
 router.post('/', trimRequest.all, createTransaction)
+router.get('/:id', trimRequest.all, validateGetTransaction, getTransaction)
 module.exports = router
