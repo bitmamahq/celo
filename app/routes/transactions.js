@@ -11,7 +11,8 @@ const { roleAuthorization } = require('../controllers/auth')
 
 const {
   createTransaction,
-  getTransaction
+  getTransaction,
+  confirmTransaction
 } = require('../controllers/transactions')
 const {
   validateGetTransaction
@@ -22,4 +23,10 @@ const {
  */
 router.post('/', trimRequest.all, createTransaction)
 router.get('/:id', trimRequest.all, validateGetTransaction, getTransaction)
+router.get(
+  '/confirm/:id',
+  trimRequest.all,
+  validateGetTransaction,
+  confirmTransaction
+)
 module.exports = router
