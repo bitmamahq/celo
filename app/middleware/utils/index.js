@@ -9,6 +9,7 @@ const { itemNotFound } = require('./itemNotFound')
 const { removeExtensionFromFile } = require('./removeExtensionFromFile')
 const { validateResult } = require('./validateResult')
 const { validateBankCode } = require('./validateBankCode')
+const { validateAccount } = require('./validateAccountNumber')
 
 module.exports = {
   buildErrObject,
@@ -21,5 +22,6 @@ module.exports = {
   itemNotFound,
   removeExtensionFromFile,
   validateResult,
-  validateBankCode
+  validateBankCode,
+  validateAccount
 }

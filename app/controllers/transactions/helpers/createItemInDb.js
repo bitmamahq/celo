@@ -16,7 +16,8 @@ const createItemInDb = ({
   country = '',
   bankCode = '',
   bankAccountNumber = '',
-  bankName = ''
+  bankName = '',
+  bankAccountName = ''
 }) => {
   return new Promise((resolve, reject) => {
     const transaction = new Transaction({
@@ -30,7 +31,8 @@ const createItemInDb = ({
       country,
       bankCode,
       bankAccountNumber,
-      bankName
+      bankName,
+      bankAccountName
     })
 
     transaction.save((err, item) => {

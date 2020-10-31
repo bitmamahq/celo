@@ -2,7 +2,7 @@ const validator = require('express-validator')
 const { handleError } = require('../../middleware/utils')
 const RateModel = require('../../models/rate')
 const { createItemInDb } = require('./helpers')
-const { validateBankCode } = require('../../middleware/utils')
+const { validateBankCode, validateAccount } = require('../../middleware/utils')
 const percentageFee = Number.parseFloat(process.env.PERCENTAGE_FEE)
 const flatFee = Number.parseFloat(process.env.FLAT_FEE)
 
@@ -33,6 +33,10 @@ const createTransaction = async (req, res) => {
     }
 
     let isValidBankCode = await validateBankCode(data.bankCode)
+    let validAccountNumber = await validateAccount(
+      data.bankCode,
+      data.bankAccountNumber
+    )
 
     finalAmount = destAmount - fee
     let transObj = {
@@ -46,7 +50,8 @@ const createTransaction = async (req, res) => {
       country: data.destCurrency === 'ghs' ? 'GH' : 'NG',
       bankCode: data.bankCode,
       bankAccountNumber: data.bankAccountNumber,
-      bankName: isValidBankCode.bankName
+      bankName: isValidBankCode.bankName,
+      bankAccountName: validAccountNumber.account_name
     }
     const item = await createItemInDb(transObj)
     res.status(201).json(item)

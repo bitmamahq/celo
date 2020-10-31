@@ -11,7 +11,6 @@ const validateBankCode = async (bankCode = '') => {
     let banks = await listBanks()
     let bankArr = banks.data
     let checkBank = bankArr.filter((item) => item.bankCode === bankCode)
-    console.log('BANKS:: ', checkBank)
     if (!checkBank.length) {
       return Promise.reject(buildErrObject(422, 'INVALID_BANKCODE'))
     }

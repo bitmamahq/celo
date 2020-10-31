@@ -45,6 +45,9 @@ const TransactionSchema = new mongoose.Schema(
     bankAccountNumber: {
       type: String
     },
+    bankAccountName: {
+      type: String
+    },
     status: {
       type: String,
       default: 'pending',
