@@ -37,5 +37,18 @@ describe('*********** TRANSACTION ***********', () => {
           done()
         })
     })
+    it('it should not create a new transaction without key value', (done) => {
+      delete newObj.srcCurrency
+      chai
+        .request(server)
+        .post('/transactions')
+        .send(newObj)
+        .end((err, res) => {
+          res.should.have.status(422)
+          res.body.should.be.a('object')
+          res.body.should.have.property('errors')
+          done()
+        })
+    })
   })
 })
