@@ -69,10 +69,9 @@ describe('*********** TRANSACTION ***********', () => {
           res.body.txData.destCurrency.should.be.eql('ngn')
           res.body.txData.srcAmount.should.be.eql(10000)
           res.body.txData.country.should.be.eql('Nigeria')
-          res.body.txData.bankCode.should.be.eql('058')
-          res.body.txData.bankAccountNumber.should.be.eql('0553561556')
-          res.body.txData.bankName.should.be.eql('Diamond Bank')
-          res.body.txData.accountName.should.be.eql('Chinemerem')
+          // res.body.txData.bankDetails.bankAccountNumber.should.be.eql('0553561556')
+          // res.body.txData.bankDetails.bankName.should.be.eql('Diamond Bank')
+          // res.body.txData.bankDetails.accountName.should.be.eql('Chinemerem')
 
           // transactionId = res.body.txData._id
           done()
