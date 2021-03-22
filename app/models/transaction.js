@@ -6,12 +6,12 @@ const TransactionSchema = new mongoose.Schema(
   {
     srcCurrency: {
       type: String,
-      enum: ['ghs', 'ngn'],
+      enum: ['ghs', 'ngn', 'celo', 'cusd'],
       required: true
     },
     destCurrency: {
       type: String,
-      enum: ['celo', 'cusd'],
+      enum: ['celo', 'cusd', 'ghs', 'ngn'],
       required: true
     },
     type: {

@@ -4,7 +4,8 @@ const RateModel = require('../../models/rate')
 const events = require('../../customEvents')
 const Transaction = require('../../models/transaction')
 const Fee = require('../../models/Fee')
-const axiosLib = require('../../middleware/utils/axiosLib')
+const resolveBankAccountLib = require('../../middleware/utils/resolveBankAccountLib')
+const tickerLib = require('../../middleware/utils/tickerLib')
 // const { createItemInDb } = require('./helpers')
 
 /* eslint-disable */
@@ -12,12 +13,7 @@ const createTransaction = async (req, res) => {
   try {
     const { srcCurrency, destCurrency, srcAmount, country } = req.body
 
-    let newCurrencyPair
-    if (destCurrency === 'cusd') {
-      newCurrencyPair = `usd${srcCurrency}`
-    } else {
-      newCurrencyPair = `${destCurrency}${srcCurrency}`
-    }
+    const newCurrencyPair = await tickerLib.getTicker(srcCurrency, destCurrency)
 
     // get buyRate from db
     let rateData
@@ -109,58 +105,17 @@ const createWithdrawalTransaction = async (req, res) => {
       bankCode,
       bankAccountNumber,
       bankName,
-      account_name
+      accountName
     } = req.body
-    const obj = {
-      srcCurrency,
+
+    const newCurrencyPair = await tickerLib.getTicker(destCurrency, srcCurrency)
+    const resolveBankAccount = await resolveBankAccountLib.resolveBankaccount(
       destCurrency,
-      srcAmount,
-      country,
-      bankCode,
       bankAccountNumber,
+      bankCode,
       bankName,
-      account_name
-    }
-    let txData
-    let newCurrencyPair
-
-    // set ticker
-    if (srcCurrency === 'cusd') {
-      newCurrencyPair = `usd${destCurrency}`
-    } else {
-      newCurrencyPair = `${srcCurrency}${destCurrency}`
-    }
-    // resolve account
-    const axiosBody = {
-      accountNumber: bankAccountNumber,
-      bankCode: bankCode
-    }
-    const axiosHeaders = {
-      'Content-Type': 'application/json',
-      token: process.env.ENTERPRISE_TOKEN
-    }
-
-    if (destCurrency === 'ngn') {
-      const resolveBankEndpoint = `${process.env.ENTERPRISE_BASE_URL}v1/banks/resolve`
-      const resolveBankAccount = await axiosLib.post(
-        resolveBankEndpoint,
-        axiosBody,
-        axiosHeaders
-      )
-      // const ngBanksEndpoint = `${process.env.ENTERPRISE_BASE_URL}v1/banks/ng`
-      txData = {
-        'bankDetails.bankName': bankName,
-        'bankDetails.bankCode': bankCode,
-        'bankDetails.bankAccountNumber':
-          resolveBankAccount.data.message.data.account_number,
-        'bankDetails.bankAccountName':
-          resolveBankAccount.data.message.data.account_name
-      }
-    } else {
-      // const ghBanksEndpoint = `${process.env.ENTERPRISE_BASE_URL}v1/banks/gh`
-      txData = {}
-    }
-
+      accountName
+    )
     // get rate
     let rateData
     if (destCurrency === 'ghs' && srcCurrency === 'cusd') {
@@ -202,8 +157,19 @@ const createWithdrawalTransaction = async (req, res) => {
     let destAmount = srcAmount * rate
     const txFee = percentageFee.amount / 100
     const txCharge = txFee * destAmount
-    updatedDestAmount = destAmount - txCharge
-
+    const updatedDestAmount = destAmount - txCharge
+    const txData = new Transaction({
+      ...resolveBankAccount,
+      type: 'sell',
+      srcCurrency,
+      destCurrency,
+      srcAmount,
+      country,
+      rate: rate,
+      currencyPair: newCurrencyPair,
+      destAmount: updatedDestAmount,
+      fee: txCharge
+    })
     // emit discord event
     events.emit(
       'sendDiscordWebhook',
@@ -223,7 +189,8 @@ const createWithdrawalTransaction = async (req, res) => {
           `,
       process.env.DISCORD_CHANNEL
     )
-    return res.status(201).json({ rateData })
+    await txData.save()
+    return res.status(201).json({ txData })
   } catch (error) {
     console.log(error)
     handleError(res, error)

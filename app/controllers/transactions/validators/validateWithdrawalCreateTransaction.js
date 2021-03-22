@@ -48,7 +48,7 @@ const validateWithdrawalCreateTransaction = [
     .not()
     .isEmpty()
     .withMessage('IS_EMPTY'),
-  check('account_name')
+  check('accountName')
     .exists()
     .withMessage('MISSING')
     .not()
