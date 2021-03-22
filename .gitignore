@@ -69,3 +69,4 @@ typings/
 .env.production
 
 .history/
+notes.md
