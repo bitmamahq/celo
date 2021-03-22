@@ -25,6 +25,16 @@ const txObj = {
   currencyPair: 'usdghs',
   country: 'Ghana'
 }
+const txWithObj = {
+  srcCurrency: 'cusd',
+  destCurrency: 'ngn',
+  srcAmount: 10000,
+  country: 'Nigeria',
+  bankCode: '058',
+  bankAccountNumber: '0553561556',
+  bankName: 'Diamond Bank',
+  accountName: 'Chinemerem'
+}
 let transactionId = ''
 
 describe('*********** TRANSACTION ***********', () => {
@@ -44,6 +54,27 @@ describe('*********** TRANSACTION ***********', () => {
           res.body.txData.country.should.be.eql('Ghana')
 
           transactionId = res.body.txData._id
+          done()
+        })
+    })
+    it('it should create a new withdrawal transaction', (done) => {
+      chai
+        .request(server)
+        .post('/transactions/withdraw')
+        .send(txWithObj)
+        .end((err, res) => {
+          res.should.have.status(201)
+          // res.body.should.be.an('string')
+          res.body.txData.srcCurrency.should.be.eql('cusd')
+          res.body.txData.destCurrency.should.be.eql('ngn')
+          res.body.txData.srcAmount.should.be.eql(10000)
+          res.body.txData.country.should.be.eql('Nigeria')
+          res.body.txData.bankCode.should.be.eql('058')
+          res.body.txData.bankAccountNumber.should.be.eql('0553561556')
+          res.body.txData.bankName.should.be.eql('Diamond Bank')
+          res.body.txData.accountName.should.be.eql('Chinemerem')
+
+          // transactionId = res.body.txData._id
           done()
         })
     })
