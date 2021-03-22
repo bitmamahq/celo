@@ -1,11 +1,11 @@
 // const validator = require('express-validator')
 const { handleError } = require('../../middleware/utils')
-const RateModel = require('../../models/rate')
 const events = require('../../customEvents')
 const Transaction = require('../../models/transaction')
 const Fee = require('../../models/Fee')
 const resolveBankAccountLib = require('../../middleware/utils/resolveBankAccountLib')
 const tickerLib = require('../../middleware/utils/tickerLib')
+const rateLib = require('../../middleware/utils/rateLib')
 // const { createItemInDb } = require('./helpers')
 
 /* eslint-disable */
@@ -16,41 +16,11 @@ const createTransaction = async (req, res) => {
     const newCurrencyPair = await tickerLib.getTicker(srcCurrency, destCurrency)
 
     // get buyRate from db
-    let rateData
-    if (srcCurrency === 'ghs' && destCurrency === 'cusd') {
-      rateData = await RateModel.findOne({
-        name: 'ghsCusdBuyRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else if (srcCurrency === 'ngn' && destCurrency === 'cusd') {
-      rateData = await RateModel.findOne({
-        name: 'ngnCusdBuyRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else if (srcCurrency === 'ghs' && destCurrency === 'celo') {
-      rateData = await RateModel.findOne({
-        name: 'ghsCeloBuyRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else if (srcCurrency === 'ngn' && destCurrency === 'celo') {
-      rateData = await RateModel.findOne({
-        name: 'ngnCeloBuyRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else {
-      throw new Error(
-        'Source currency or destination currency is not supported'
-      )
-    }
-
+    const rateData = await rateLib.getBuyRateData(
+      srcCurrency,
+      destCurrency,
+      newCurrencyPair
+    )
     // fee
     const percentageFee = await Fee.findOne({ name: 'percentagefee' })
     const rate = rateData.rate
@@ -68,7 +38,7 @@ const createTransaction = async (req, res) => {
       currencyPair: newCurrencyPair,
       destAmount,
       fee: txCharge,
-      type: 'Buy'
+      type: 'buy'
     })
     // emit discord event
     events.emit(
@@ -88,7 +58,7 @@ const createTransaction = async (req, res) => {
     )
 
     await txData.save()
-    return res.status(201).json({ ...txData })
+    return res.status(201).json({ txData })
   } catch (error) {
     handleError(res, error)
   }
@@ -117,41 +87,11 @@ const createWithdrawalTransaction = async (req, res) => {
       accountName
     )
     // get rate
-    let rateData
-    if (destCurrency === 'ghs' && srcCurrency === 'cusd') {
-      rateData = await RateModel.findOne({
-        name: 'ghsCusdSellRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else if (destCurrency === 'ngn' && srcCurrency === 'cusd') {
-      rateData = await RateModel.findOne({
-        name: 'ngnCusdSellRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else if (destCurrency === 'ghs' && srcCurrency === 'celo') {
-      rateData = await RateModel.findOne({
-        name: 'ghsCeloSellRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else if (destCurrency === 'ngn' && srcCurrency === 'celo') {
-      console.log('-------hit here oh------')
-      rateData = await RateModel.findOne({
-        name: 'ngnCeloSellRate',
-        ticker: newCurrencyPair
-      })
-        .select('-_id')
-        .lean()
-    } else {
-      throw new Error(
-        'Source currency or destination currency is not supported'
-      )
-    }
+    const rateData = await rateLib.getSellRateData(
+      destCurrency,
+      srcCurrency,
+      newCurrencyPair
+    )
     const percentageFee = await Fee.findOne({ name: 'percentagefee' })
     const rate = rateData.rate
     let destAmount = srcAmount * rate

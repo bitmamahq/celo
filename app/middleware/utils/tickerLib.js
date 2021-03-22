@@ -17,8 +17,8 @@ module.exports = (() => {
       }
       return Promise.resolve(ticker)
     } catch (err) {
-      console.error('Error in AXIOS get: ', err.response.data)
-      return Promise.reject(err.response.data)
+      console.error('Error in AXIOS get: ', err)
+      return Promise.reject(err)
     }
   }
 
