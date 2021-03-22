@@ -2,8 +2,8 @@
 
 process.env.NODE_ENV = 'test'
 
-const Rate = require('../app/models/rate')
-const faker = require('faker')
+// const Rate = require('../app/models/rate')
+// const faker = require('faker')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const server = require('../server')
@@ -30,7 +30,7 @@ describe('*********** RATE ***********', () => {
   describe('/GET/:peer rate', () => {
     it('it should GET a rate by the given peer', (done) => {
       const realPeer = 'usdngn'
-      const fakePeer = 'myname'
+      // const fakePeer = 'myname'
       chai
         .request(server)
         .get(`/rates/${realPeer}`)
@@ -38,7 +38,8 @@ describe('*********** RATE ***********', () => {
           res.should.have.status(200)
           res.body.should.be.a('object')
           res.body.should.have.property('msg')
-          res.body.msg.should.have.property('name').eql(realPeer)
+          res.body.msg.should.have.property('ticker').eql(realPeer)
+          res.body.msg.should.have.property('name').eql('ngnCusdBuyRate')
           res.body.msg.should.have.property('rate')
           done()
         })

@@ -1,18 +1,14 @@
 const mongoose = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate-v2')
 
-const RateSchema = new mongoose.Schema(
+const FeeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true
     },
-    ticker: {
+    amount: {
       type: String
-    },
-    rate: {
-      type: Number,
-      required: true
     }
   },
   {
@@ -20,5 +16,5 @@ const RateSchema = new mongoose.Schema(
     timestamps: true
   }
 )
-RateSchema.plugin(mongoosePaginate)
-module.exports = mongoose.model('Rate', RateSchema)
+FeeSchema.plugin(mongoosePaginate)
+module.exports = mongoose.model('Fee', FeeSchema)

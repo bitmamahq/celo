@@ -10,6 +10,8 @@ const app = express()
 const i18n = require('i18n')
 const initMongo = require('./config/mongo')
 const path = require('path')
+const discordEvent = require('./app/customEvents/discordEvent')
+const event = require('./app/customEvents')
 
 // Setup express server port from ENV, default: 3000
 app.set('port', process.env.PORT || 3000)
@@ -57,7 +59,8 @@ i18n.configure({
   objectNotation: true
 })
 app.use(i18n.init)
-
+// events
+discordEvent(event)
 // Init all other stuff
 app.use(cors())
 app.use(passport.initialize())

@@ -23,37 +23,13 @@ const validateCreateTransaction = [
     .not()
     .isEmpty()
     .withMessage('IS_EMPTY'),
-  check('destAmount')
+  check('country')
     .exists()
     .withMessage('MISSING')
     .not()
     .isEmpty()
     .withMessage('IS_EMPTY'),
-  check('rate')
-    .exists()
-    .isNumeric()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY'),
-  check('currencyPair')
-    .exists()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY'),
-  check('status')
-    .exists()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY'),
-  check('userId')
-    .exists()
-    .withMessage('MISSING')
-    .not()
-    .isEmpty()
-    .withMessage('IS_EMPTY'),
+
   (req, res, next) => {
     validateResult(req, res, next)
   }
