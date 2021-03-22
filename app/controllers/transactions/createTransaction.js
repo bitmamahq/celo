@@ -4,10 +4,8 @@ const RateModel = require('../../models/rate')
 const events = require('../../customEvents')
 const Transaction = require('../../models/transaction')
 const Fee = require('../../models/Fee')
+const axiosLib = require('../../middleware/utils/axiosLib')
 // const { createItemInDb } = require('./helpers')
-// const { validateBankCode, validateAccount } = require('../../middleware/utils')
-// const percentageFee = Number.parseFloat(process.env.PERCENTAGE_FEE)
-// const flatFee = Number.parseFloat(process.env.FLAT_FEE)
 
 /* eslint-disable */
 const createTransaction = async (req, res) => {
@@ -73,7 +71,8 @@ const createTransaction = async (req, res) => {
       rate: rate,
       currencyPair: newCurrencyPair,
       destAmount,
-      fee: txCharge
+      fee: txCharge,
+      type: 'Buy'
     })
     // emit discord event
     events.emit(
@@ -93,12 +92,143 @@ const createTransaction = async (req, res) => {
     )
 
     await txData.save()
-    return res.status(201).json({ txData })
+    return res.status(201).json({ ...txData })
   } catch (error) {
     handleError(res, error)
   }
 }
+/* eslint-disable */
 
+const createWithdrawalTransaction = async (req, res) => {
+  try {
+    const {
+      srcCurrency,
+      destCurrency,
+      srcAmount,
+      country,
+      bankCode,
+      bankAccountNumber,
+      bankName,
+      account_name
+    } = req.body
+    const obj = {
+      srcCurrency,
+      destCurrency,
+      srcAmount,
+      country,
+      bankCode,
+      bankAccountNumber,
+      bankName,
+      account_name
+    }
+    let txData
+    let newCurrencyPair
+
+    // set ticker
+    if (srcCurrency === 'cusd') {
+      newCurrencyPair = `usd${destCurrency}`
+    } else {
+      newCurrencyPair = `${srcCurrency}${destCurrency}`
+    }
+    // resolve account
+    const axiosBody = {
+      accountNumber: bankAccountNumber,
+      bankCode: bankCode
+    }
+    const axiosHeaders = {
+      'Content-Type': 'application/json',
+      token: process.env.ENTERPRISE_TOKEN
+    }
+
+    if (destCurrency === 'ngn') {
+      const resolveBankEndpoint = `${process.env.ENTERPRISE_BASE_URL}v1/banks/resolve`
+      const resolveBankAccount = await axiosLib.post(
+        resolveBankEndpoint,
+        axiosBody,
+        axiosHeaders
+      )
+      // const ngBanksEndpoint = `${process.env.ENTERPRISE_BASE_URL}v1/banks/ng`
+      txData = {
+        'bankDetails.bankName': bankName,
+        'bankDetails.bankCode': bankCode,
+        'bankDetails.bankAccountNumber':
+          resolveBankAccount.data.message.data.account_number,
+        'bankDetails.bankAccountName':
+          resolveBankAccount.data.message.data.account_name
+      }
+    } else {
+      // const ghBanksEndpoint = `${process.env.ENTERPRISE_BASE_URL}v1/banks/gh`
+      txData = {}
+    }
+
+    // get rate
+    let rateData
+    if (destCurrency === 'ghs' && srcCurrency === 'cusd') {
+      rateData = await RateModel.findOne({
+        name: 'ghsCusdSellRate',
+        ticker: newCurrencyPair
+      })
+        .select('-_id')
+        .lean()
+    } else if (destCurrency === 'ngn' && srcCurrency === 'cusd') {
+      rateData = await RateModel.findOne({
+        name: 'ngnCusdSellRate',
+        ticker: newCurrencyPair
+      })
+        .select('-_id')
+        .lean()
+    } else if (destCurrency === 'ghs' && srcCurrency === 'celo') {
+      rateData = await RateModel.findOne({
+        name: 'ghsCeloSellRate',
+        ticker: newCurrencyPair
+      })
+        .select('-_id')
+        .lean()
+    } else if (destCurrency === 'ngn' && srcCurrency === 'celo') {
+      console.log('-------hit here oh------')
+      rateData = await RateModel.findOne({
+        name: 'ngnCeloSellRate',
+        ticker: newCurrencyPair
+      })
+        .select('-_id')
+        .lean()
+    } else {
+      throw new Error(
+        'Source currency or destination currency is not supported'
+      )
+    }
+    const percentageFee = await Fee.findOne({ name: 'percentagefee' })
+    const rate = rateData.rate
+    let destAmount = srcAmount * rate
+    const txFee = percentageFee.amount / 100
+    const txCharge = txFee * destAmount
+    updatedDestAmount = destAmount - txCharge
+
+    // emit discord event
+    events.emit(
+      'sendDiscordWebhook',
+      `Sell - ${process.env.NODE_ENV}`,
+      `
+          Selling ${srcAmount}  worth of ${srcCurrency.toUpperCase()} tokens
+
+          Amount to be sent ${destCurrency} -   ${destAmount} ${destCurrency.toUpperCase()}         
+         
+          ${newCurrencyPair} sell rate -  ${rate}
+
+          Tx Fee - ${txFee}%
+
+          Amount Deducted - ${txCharge} ${destCurrency.toUpperCase()}
+
+          Updated Amount to Send - ${updatedDestAmount} ${destCurrency.toUpperCase()}
+          `,
+      process.env.DISCORD_CHANNEL
+    )
+    return res.status(201).json({ rateData })
+  } catch (error) {
+    console.log(error)
+    handleError(res, error)
+  }
+}
 // destAmount: {
 //   type: Number,
 //   required: true
@@ -136,12 +266,6 @@ const createTransaction = async (req, res) => {
 //       fee = txCharge * rate
 //     }
 
-//     let isValidBankCode = await validateBankCode(data.bankCode)
-//     let validAccountNumber = await validateAccount(
-//       data.bankCode,
-//       data.bankAccountNumber
-//     )
-
 //     finalAmount = destAmount - fee
 //     let transObj = {
 //       srcCurrency: data.srcCurrency,
@@ -164,4 +288,4 @@ const createTransaction = async (req, res) => {
 //   }
 // }
 
-module.exports = { createTransaction }
+module.exports = { createTransaction, createWithdrawalTransaction }

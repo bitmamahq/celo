@@ -12,17 +12,24 @@ const trimRequest = require('trim-request')
 const {
   createTransaction,
   getTransaction,
-  confirmTransaction
+  confirmTransaction,
+  createWithdrawalTransaction
 } = require('../controllers/transactions')
 const {
   validateGetTransaction,
-  validateCreateTransaction
+  validateCreateTransaction,
+  validateWithdrawalCreateTransaction
 } = require('../controllers/transactions/validators')
 
 /*
  * Get rates route
  */
 router.post('/', validateCreateTransaction, createTransaction)
+router.post(
+  '/withdraw',
+  validateWithdrawalCreateTransaction,
+  createWithdrawalTransaction
+)
 router.get('/:id', trimRequest.all, validateGetTransaction, getTransaction)
 router.get(
   '/confirm/:id',
