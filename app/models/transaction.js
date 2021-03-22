@@ -14,6 +14,11 @@ const TransactionSchema = new mongoose.Schema(
       enum: ['celo', 'cusd'],
       required: true
     },
+    type: {
+      type: String,
+      enum: ['buy', 'sell']
+      // required: true
+    },
     srcAmount: {
       type: Number,
       required: true
