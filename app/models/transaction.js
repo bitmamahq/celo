@@ -1,16 +1,23 @@
 const mongoose = require('mongoose')
-const validator = require('validator')
+// const validator = require('validator')
 const mongoosePaginate = require('mongoose-paginate-v2')
 
 const TransactionSchema = new mongoose.Schema(
   {
     srcCurrency: {
       type: String,
+      enum: ['ghs', 'ngn', 'celo', 'cusd'],
       required: true
     },
     destCurrency: {
       type: String,
+      enum: ['celo', 'cusd', 'ghs', 'ngn'],
       required: true
+    },
+    type: {
+      type: String,
+      enum: ['buy', 'sell']
+      // required: true
     },
     srcAmount: {
       type: Number,
@@ -36,17 +43,19 @@ const TransactionSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    bankName: {
-      type: String
-    },
-    bankCode: {
-      type: String
-    },
-    bankAccountNumber: {
-      type: String
-    },
-    bankAccountName: {
-      type: String
+    bankDetails: {
+      bankName: {
+        type: String
+      },
+      bankCode: {
+        type: String
+      },
+      bankAccountNumber: {
+        type: String
+      },
+      bankAccountName: {
+        type: String
+      }
     },
     status: {
       type: String,

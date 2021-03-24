@@ -8,14 +8,14 @@ const { handleError } = require('../../middleware/utils')
  */
 const getRate = async (req, res) => {
   try {
-    let pair = req.params.pair
-    const pairs = ['usdngn', 'usdghs']
+    const pair = req.params.pair
+    const pairs = ['usdngn', 'usdghs', 'celoghs', 'celongn']
 
     if (!pairs.includes(pair)) {
       throw new Error('Peer not valid')
     }
 
-    let query = await Rate.findOne({ name: pair }).select('-_id').lean()
+    const query = await Rate.findOne({ ticker: pair }).select('-_id').lean()
 
     if (!query) {
       throw new Error('Record not in DB')

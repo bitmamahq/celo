@@ -39,4 +39,6 @@ router.use('*', (req, res) => {
   })
 })
 
+/** address route */
+router.use('/address', require('./address'))
 module.exports = router

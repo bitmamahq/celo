@@ -1,9 +1,7 @@
 /* eslint handle-callback-err: "off"*/
-
 process.env.NODE_ENV = 'test'
-
 const Transaction = require('../app/models/transaction')
-const faker = require('faker')
+// const faker = require('faker')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const server = require('../server')
@@ -12,15 +10,31 @@ const should = chai.should()
 
 chai.use(chaiHttp)
 
-let newObj = {
+// let txObj = {
+//   srcCurrency: 'cusd',
+//   destCurrency: 'ngn',
+//   srcAmount: 100,
+//   bankCode: '005',
+//   bankName: 'Stanbic IBTC',
+//   bankAccountNumber: '0000111447'
+// }
+const txObj = {
+  srcCurrency: 'ghs',
+  destCurrency: 'celo',
+  srcAmount: '5000',
+  currencyPair: 'usdghs',
+  country: 'Ghana'
+}
+const txWithObj = {
   srcCurrency: 'cusd',
   destCurrency: 'ngn',
-  srcAmount: 100,
-  bankCode: '005',
-  bankName: 'Stanbic IBTC',
-  bankAccountNumber: '0000111447'
+  srcAmount: 10000,
+  country: 'Nigeria',
+  bankCode: '058',
+  bankAccountNumber: '0553561556',
+  bankName: 'Diamond Bank',
+  accountName: 'Chinemerem'
 }
-
 let transactionId = ''
 
 describe('*********** TRANSACTION ***********', () => {
@@ -29,21 +43,46 @@ describe('*********** TRANSACTION ***********', () => {
       chai
         .request(server)
         .post('/transactions')
-        .send(newObj)
+        .send(txObj)
         .end((err, res) => {
           res.should.have.status(201)
-          res.body.should.be.an('object')
-          res.body.status.should.be.a('string').eql('pending')
-          transactionId = res.body._id
+          // res.body.should.be.an('string')
+          res.body.txData.srcCurrency.should.be.eql('ghs')
+          res.body.txData.destCurrency.should.be.eql('celo')
+          res.body.txData.srcAmount.should.be.eql(5000)
+          res.body.txData.currencyPair.should.be.eql('celoghs')
+          res.body.txData.country.should.be.eql('Ghana')
+
+          transactionId = res.body.txData._id
+          done()
+        })
+    })
+    it('it should create a new withdrawal transaction', (done) => {
+      chai
+        .request(server)
+        .post('/transactions/withdraw')
+        .send(txWithObj)
+        .end((err, res) => {
+          res.should.have.status(201)
+          // res.body.should.be.an('string')
+          res.body.txData.srcCurrency.should.be.eql('cusd')
+          res.body.txData.destCurrency.should.be.eql('ngn')
+          res.body.txData.srcAmount.should.be.eql(10000)
+          res.body.txData.country.should.be.eql('Nigeria')
+          // res.body.txData.bankDetails.bankAccountNumber.should.be.eql('0553561556')
+          // res.body.txData.bankDetails.bankName.should.be.eql('Diamond Bank')
+          // res.body.txData.bankDetails.accountName.should.be.eql('Chinemerem')
+
+          // transactionId = res.body.txData._id
           done()
         })
     })
     it('it should not create a new transaction without key value', (done) => {
-      delete newObj.srcCurrency
+      delete txObj.srcCurrency
       chai
         .request(server)
         .post('/transactions')
-        .send(newObj)
+        .send(txObj)
         .end((err, res) => {
           res.should.have.status(422)
           res.body.should.be.a('object')

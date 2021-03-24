@@ -1,9 +1,13 @@
-const { createTransaction } = require('./createTransaction')
+const {
+  createTransaction,
+  createWithdrawalTransaction
+} = require('./createTransaction')
 const { getTransaction } = require('./getTransaction')
 const { confirmTransaction } = require('./confirmTransaction')
 
 module.exports = {
   createTransaction,
   getTransaction,
-  confirmTransaction
+  confirmTransaction,
+  createWithdrawalTransaction
 }
