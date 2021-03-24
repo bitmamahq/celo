@@ -9,10 +9,19 @@ const rateLib = require('../../middleware/utils/rateLib')
 // const { createItemInDb } = require('./helpers')
 
 /* eslint-disable */
-const createTransaction = async (req, res) => {
+const createBuyTransaction = async (req, res) => {
   try {
-    const { srcCurrency, destCurrency, srcAmount, country } = req.body
+    const { srcCurrency, destCurrency, srcAmount, country, address } = req.body
+    const srcArray = ['ngn', 'ghs']
+    const destArray = ['cusd', 'celo']
 
+    if (!srcArray.includes(srcCurrency)) {
+      throw new Error('WRONG_SOURCE')
+    }
+
+    if (!destArray.includes(destCurrency)) {
+      throw new Error('WRONG_DESTINATION')
+    }
     const newCurrencyPair = await tickerLib.getTicker(srcCurrency, destCurrency)
 
     // get buyRate from db
@@ -21,8 +30,10 @@ const createTransaction = async (req, res) => {
       destCurrency,
       newCurrencyPair
     )
+
     // fee
     const percentageFee = await Fee.findOne({ name: 'percentagefee' })
+    // const rate = rateData
     const rate = rateData.rate
     let destAmount = srcAmount / rate
     const txCharge = (percentageFee.amount / 100) * destAmount
@@ -36,6 +47,7 @@ const createTransaction = async (req, res) => {
       country,
       rate: rate,
       currencyPair: newCurrencyPair,
+      address,
       destAmount,
       fee: txCharge,
       type: 'buy'
@@ -65,7 +77,7 @@ const createTransaction = async (req, res) => {
 }
 /* eslint-disable */
 
-const createWithdrawalTransaction = async (req, res) => {
+const createSellTransaction = async (req, res) => {
   try {
     const {
       srcCurrency,
@@ -117,8 +129,8 @@ const createWithdrawalTransaction = async (req, res) => {
       `
           Selling ${srcAmount}  worth of ${srcCurrency.toUpperCase()} tokens
 
-          Amount to be sent ${destCurrency} -   ${destAmount} ${destCurrency.toUpperCase()}         
-         
+          Amount to be sent ${destCurrency} -   ${destAmount} ${destCurrency.toUpperCase()}
+
           ${newCurrencyPair} sell rate -  ${rate}
 
           Tx Fee - ${txFee}%
@@ -195,4 +207,4 @@ const createWithdrawalTransaction = async (req, res) => {
 //   }
 // }
 
-module.exports = { createTransaction, createWithdrawalTransaction }
+module.exports = { createBuyTransaction, createSellTransaction }

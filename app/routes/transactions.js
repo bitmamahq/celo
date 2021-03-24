@@ -10,10 +10,10 @@ const trimRequest = require('trim-request')
 // const { roleAuthorization } = require('../controllers/auth')
 
 const {
-  createTransaction,
+  createBuyTransaction,
   getTransaction,
   confirmTransaction,
-  createWithdrawalTransaction
+  createSellTransaction
 } = require('../controllers/transactions')
 const {
   validateGetTransaction,
@@ -24,12 +24,8 @@ const {
 /*
  * Get rates route
  */
-router.post('/', validateCreateTransaction, createTransaction)
-router.post(
-  '/withdraw',
-  validateWithdrawalCreateTransaction,
-  createWithdrawalTransaction
-)
+router.post('/buy', validateCreateTransaction, createBuyTransaction)
+router.post('/sell', validateWithdrawalCreateTransaction, createSellTransaction)
 router.get('/:id', trimRequest.all, validateGetTransaction, getTransaction)
 router.get(
   '/confirm/:id',
