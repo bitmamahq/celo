@@ -33,7 +33,7 @@ module.exports = (() => {
           'Content-Type': 'application/json',
           token: process.env.ENTERPRISE_TOKEN
         }
-        const endpoint = `${process.env.ENTERPRISE_BASE_URL}/v1/rate?ticker=celoghs`
+        const endpoint = `${process.env.ENTERPRISE_BASE_URL}v1/rate?ticker=celoghs`
         rateData = await axiosLib.get(endpoint, axiosHeaders)
         rateData = {
           rate: rateData.data.message.sell
