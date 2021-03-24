@@ -4,7 +4,7 @@
   "description": "A cUSD to fiat exchange developed by Bitmama.io",
   "license": "APACHE",
   "scripts": {
-    "start": "cross-env NODE_ENV=production pm2 start server.js",
+    "start": "node server.js",
     "mocha": "nyc mocha --timeout=5000 --exit",
     "test": "npm run coverage:clean && npm run test:unit && npm run test:e2e && npm run coverage",
     "test:unit": "NODE_ENV=test jest --coverage",
