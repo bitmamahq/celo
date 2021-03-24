@@ -27,6 +27,9 @@ const TransactionSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
+    address: {
+      type: String
+    },
     rate: {
       type: Number,
       required: true

@@ -17,6 +17,14 @@ const validateCreateTransaction = [
     .not()
     .isEmpty()
     .withMessage('IS_EMPTY'),
+  check('address')
+    .exists()
+    .withMessage('MISSING')
+    .not()
+    .isEmpty()
+    .withMessage('IS_EMPTY')
+    .isEthereumAddress()
+    .withMessage('WRONG_ADDRESS_TYPE'),
   check('srcAmount')
     .exists()
     .withMessage('MISSING')

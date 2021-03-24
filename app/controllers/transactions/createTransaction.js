@@ -11,8 +11,17 @@ const rateLib = require('../../middleware/utils/rateLib')
 /* eslint-disable */
 const createBuyTransaction = async (req, res) => {
   try {
-    const { srcCurrency, destCurrency, srcAmount, country } = req.body
+    const { srcCurrency, destCurrency, srcAmount, country, address } = req.body
+    const srcArray = ['ngn', 'ghs']
+    const destArray = ['cusd', 'celo']
 
+    if (!srcArray.includes(srcCurrency)) {
+      throw new Error('WRONG_SOURCE')
+    }
+
+    if (!destArray.includes(destCurrency)) {
+      throw new Error('WRONG_DESTINATION')
+    }
     const newCurrencyPair = await tickerLib.getTicker(srcCurrency, destCurrency)
 
     // get buyRate from db
@@ -21,6 +30,7 @@ const createBuyTransaction = async (req, res) => {
       destCurrency,
       newCurrencyPair
     )
+
     // fee
     const percentageFee = await Fee.findOne({ name: 'percentagefee' })
     // const rate = rateData
@@ -37,6 +47,7 @@ const createBuyTransaction = async (req, res) => {
       country,
       rate: rate,
       currencyPair: newCurrencyPair,
+      address,
       destAmount,
       fee: txCharge,
       type: 'buy'
