@@ -23,6 +23,7 @@ const createTransaction = async (req, res) => {
     )
     // fee
     const percentageFee = await Fee.findOne({ name: 'percentagefee' })
+    // const rate = rateData
     const rate = rateData.rate
     let destAmount = srcAmount / rate
     const txCharge = (percentageFee.amount / 100) * destAmount

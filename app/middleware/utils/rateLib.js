@@ -1,4 +1,6 @@
 const RateModel = require('../../models/rate')
+const axiosLib = require('./axiosLib')
+
 module.exports = (() => {
   const funcs = {} // resolve account
 
@@ -8,6 +10,7 @@ module.exports = (() => {
    * @param headers
    * @returns {Promise<{data: any, status: number}>}
    */
+  /* eslint-disable */
   funcs.getSellRateData = async (destCurrency, srcCurrency, ticker) => {
     try {
       let rateData
@@ -26,20 +29,25 @@ module.exports = (() => {
           .select('-_id')
           .lean()
       } else if (destCurrency === 'ghs' && srcCurrency === 'celo') {
-        rateData = await RateModel.findOne({
-          name: 'ghsCeloSellRate',
-          ticker
-        })
-          .select('-_id')
-          .lean()
+        const axiosHeaders = {
+          'Content-Type': 'application/json',
+          token: process.env.ENTERPRISE_TOKEN
+        }
+        const endpoint = `${process.env.ENTERPRISE_BASE_URL}/v1/rate?ticker=celoghs`
+        rateData = await axiosLib.get(endpoint, axiosHeaders)
+        rateData = {
+          rate: rateData.data.message.sell
+        }
       } else if (destCurrency === 'ngn' && srcCurrency === 'celo') {
-        console.log('-------hit here oh------')
-        rateData = await RateModel.findOne({
-          name: 'ngnCeloSellRate',
-          ticker
-        })
-          .select('-_id')
-          .lean()
+        const axiosHeaders = {
+          'Content-Type': 'application/json',
+          token: process.env.ENTERPRISE_TOKEN
+        }
+        const endpoint = `${process.env.ENTERPRISE_BASE_URL}v1/rate?ticker=celongn`
+        rateData = await axiosLib.get(endpoint, axiosHeaders)
+        rateData = {
+          rate: rateData.data.message.sell
+        }
       } else {
         throw new Error(
           'Source currency or destination currency is not supported'
@@ -50,6 +58,7 @@ module.exports = (() => {
       return Promise.reject(err)
     }
   }
+  /* eslint-disable */
   funcs.getBuyRateData = async (srcCurrency, destCurrency, ticker) => {
     try {
       let rateData
@@ -68,19 +77,25 @@ module.exports = (() => {
           .select('-_id')
           .lean()
       } else if (srcCurrency === 'ghs' && destCurrency === 'celo') {
-        rateData = await RateModel.findOne({
-          name: 'ghsCeloBuyRate',
-          ticker
-        })
-          .select('-_id')
-          .lean()
+        const axiosHeaders = {
+          'Content-Type': 'application/json',
+          token: process.env.ENTERPRISE_TOKEN
+        }
+        const endpoint = `${process.env.ENTERPRISE_BASE_URL}v1/rate?ticker=celoghs`
+        rateData = await axiosLib.get(endpoint, axiosHeaders)
+        rateData = {
+          rate: rateData.data.message.buy
+        }
       } else if (srcCurrency === 'ngn' && destCurrency === 'celo') {
-        rateData = await RateModel.findOne({
-          name: 'ngnCeloBuyRate',
-          ticker
-        })
-          .select('-_id')
-          .lean()
+        const axiosHeaders = {
+          'Content-Type': 'application/json',
+          token: process.env.ENTERPRISE_TOKEN
+        }
+        const endpoint = `${process.env.ENTERPRISE_BASE_URL}v1/rate?ticker=celongn`
+        rateData = await axiosLib.get(endpoint, axiosHeaders)
+        rateData = {
+          rate: rateData.data.message.buy
+        }
       } else {
         throw new Error(
           'Source currency or destination currency is not supported'
