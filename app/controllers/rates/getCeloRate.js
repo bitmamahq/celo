@@ -21,7 +21,7 @@ const getCeloRate = async (req, res) => {
     const endpoint = `${process.env.ENTERPRISE_BASE_URL}v1/rate?ticker=${pair}`
     const getRate = await axiosLib.get(endpoint, axiosHeaders)
 
-    res.status(200).json({ ...getRate })
+    res.status(200).json({ ...getRate.data.message })
   } catch (error) {
     handleError(res, error)
   }
