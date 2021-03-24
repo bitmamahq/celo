@@ -9,7 +9,7 @@ const rateLib = require('../../middleware/utils/rateLib')
 // const { createItemInDb } = require('./helpers')
 
 /* eslint-disable */
-const createTransaction = async (req, res) => {
+const createBuyTransaction = async (req, res) => {
   try {
     const { srcCurrency, destCurrency, srcAmount, country } = req.body
 
@@ -66,7 +66,7 @@ const createTransaction = async (req, res) => {
 }
 /* eslint-disable */
 
-const createWithdrawalTransaction = async (req, res) => {
+const createSellTransaction = async (req, res) => {
   try {
     const {
       srcCurrency,
@@ -118,8 +118,8 @@ const createWithdrawalTransaction = async (req, res) => {
       `
           Selling ${srcAmount}  worth of ${srcCurrency.toUpperCase()} tokens
 
-          Amount to be sent ${destCurrency} -   ${destAmount} ${destCurrency.toUpperCase()}         
-         
+          Amount to be sent ${destCurrency} -   ${destAmount} ${destCurrency.toUpperCase()}
+
           ${newCurrencyPair} sell rate -  ${rate}
 
           Tx Fee - ${txFee}%
@@ -196,4 +196,4 @@ const createWithdrawalTransaction = async (req, res) => {
 //   }
 // }
 
-module.exports = { createTransaction, createWithdrawalTransaction }
+module.exports = { createBuyTransaction, createSellTransaction }

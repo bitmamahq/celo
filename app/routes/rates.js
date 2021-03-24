@@ -9,13 +9,13 @@ const trimRequest = require('trim-request')
 
 // const { roleAuthorization } = require('../controllers/auth')
 
-const { getRates, getRate, getCeloRate } = require('../controllers/rates')
+const { getRates, getCeloRate } = require('../controllers/rates')
 
 /*
  * Get rates route
  */
 router.get('/', trimRequest.all, getRates)
-router.get('/celo/:pair', trimRequest.all, getCeloRate)
-router.get('/:pair', trimRequest.all, getRate)
+// router.get('/celo/:pair', trimRequest.all, getCeloRate)
+router.get('/:pair', trimRequest.all, getCeloRate)
 
 module.exports = router
